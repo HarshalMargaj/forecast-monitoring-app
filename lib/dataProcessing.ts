@@ -1,4 +1,5 @@
-import type { ActualRecord, ForecastRecord } from "@/types";
+import type { ActualRecord, ChartDataPoint, ForecastRecord } from "@/types";
+import { format } from "date-fns";
 
 const MIN_TIMESTAMP = new Date("2025-01-01T00:00:00Z").getTime();
 const THIRTY_MIN_MS = 30 * 60 * 1000;
@@ -61,4 +62,59 @@ export function buildForecastsMap(
 		result.set(ts, generation);
 	}
 	return result;
+}
+
+export function mergeToChartData(
+	actualsMap: Map<number, number>,
+	forecastsMap: Map<number, number>,
+): ChartDataPoint[] {
+	const allTs = new Set([...actualsMap.keys(), ...forecastsMap.keys()]);
+	const sorted = Array.from(allTs).sort((a, b) => a - b);
+
+	return sorted.map(ts => ({
+		timestamp: ts,
+		timeLabel: format(new Date(ts), "dd/MM/yy HH:mm"),
+		actual: actualsMap.get(ts) ?? null,
+		forecast: forecastsMap.get(ts) ?? null,
+	}));
+}
+
+export interface AccuracyMetrics {
+	actualPoints: number;
+	forecastPoints: number;
+	matchedPoints: number;
+	mae: number | null;
+	rmse: number | null;
+}
+
+export function computeMetrics(data: ChartDataPoint[]): AccuracyMetrics {
+	const actualPoints = data.filter(d => d.actual !== null).length;
+	const forecastPoints = data.filter(d => d.forecast !== null).length;
+	const matched = data.filter(d => d.actual !== null && d.forecast !== null);
+
+	if (matched.length === 0) {
+		return {
+			actualPoints,
+			forecastPoints,
+			matchedPoints: 0,
+			mae: null,
+			rmse: null,
+		};
+	}
+
+	const errors = matched.map(d => Math.abs(d.actual! - d.forecast!));
+	const squaredErrors = matched.map(d => (d.actual! - d.forecast!) ** 2);
+
+	const mae = errors.reduce((s, e) => s + e, 0) / errors.length;
+	const rmse = Math.sqrt(
+		squaredErrors.reduce((s, e) => s + e, 0) / squaredErrors.length,
+	);
+
+	return {
+		actualPoints,
+		forecastPoints,
+		matchedPoints: matched.length,
+		mae: Math.round(mae),
+		rmse: Math.round(rmse),
+	};
 }
