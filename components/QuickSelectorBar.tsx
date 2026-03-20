@@ -24,7 +24,7 @@ export function QuickSelectBar({ isLoading, onSelect }: QuickSelectBarProps) {
 					key={label}
 					onClick={() => onSelect(hours)}
 					disabled={isLoading}
-					className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+					className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
 				>
 					{label}
 				</button>
