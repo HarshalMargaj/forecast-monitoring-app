@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { ControlPanel } from "@/components/ControlPanel";
 import { ForecastChart } from "@/components/ForecastChart";
 import { MetricsBar } from "@/components/MetricsBar";
+import { QuickSelectBar } from "@/components/QuickSelectorBar";
 import { ErrorMessage, LoadingSpinner } from "@/components/StatusStates";
 import { useForecastData } from "@/hooks/useForecastData";
 import { makeHistoricalWindow } from "@/lib/dateUtils";
@@ -33,9 +34,24 @@ export default function Home() {
 		appliedHorizon,
 	);
 
+	const applyPreset = useCallback(
+		(hours: number) => {
+			const { start, end } = makeHistoricalWindow(hours);
+			setStartTime(start);
+			setEndTime(end);
+			setAppliedStart(start);
+			setAppliedEnd(end);
+			setAppliedHorizon(horizonHours);
+		},
+		[horizonHours],
+	);
+
 	return (
 		<div className="bg-white h-full">
 			<AppHeader />
+
+			<QuickSelectBar isLoading={isLoading} onSelect={applyPreset} />
+
 			<section className="mb-5">
 				<ControlPanel
 					startTime={startTime}
