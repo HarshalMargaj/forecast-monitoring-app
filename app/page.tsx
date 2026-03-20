@@ -2,6 +2,7 @@
 
 import { AppHeader } from "@/components/AppHeader";
 import { ControlPanel } from "@/components/ControlPanel";
+import { MetricsBar } from "@/components/MetricsBar";
 import { makeHistoricalWindow } from "@/lib/dateUtils";
 import { useCallback, useState } from "react";
 
@@ -16,6 +17,7 @@ export default function Home() {
 	const [appliedStart, setAppliedStart] = useState(INITIAL.start);
 	const [appliedEnd, setAppliedEnd] = useState(INITIAL.end);
 	const [appliedHorizon, setAppliedHorizon] = useState(DEFAULT_HORIZON);
+	const metrics = null;
 
 	const handleFetch = useCallback(() => {
 		setAppliedStart(startTime);
@@ -38,6 +40,12 @@ export default function Home() {
 					onFetch={handleFetch}
 				/>
 			</section>
+
+			{metrics && (
+				<section className="mb-5">
+					<MetricsBar metrics={metrics} />
+				</section>
+			)}
 		</div>
 	);
 }
