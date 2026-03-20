@@ -4,7 +4,6 @@ interface MetricsBarProps {
 	metrics: ForecastDataResult["metrics"];
 }
 
-/** Formats large numbers as "12,345 MW" */
 function fmt(n: number | null): string {
 	if (n === null) return "—";
 	return `${n.toLocaleString()} MW`;
