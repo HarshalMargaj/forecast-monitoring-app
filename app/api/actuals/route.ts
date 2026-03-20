@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ELEXON_BASE = "https://data.elexon.co.uk/bmrs/api/v1";
-
 export async function GET(request: NextRequest) {
 	const { searchParams } = new URL(request.url);
 	const from = searchParams.get("from");
@@ -14,17 +12,10 @@ export async function GET(request: NextRequest) {
 		);
 	}
 
-	const upstreamUrl = `${ELEXON_BASE}/datasets/FUELHH/stream?${searchParams}`;
+	const upstreamUrl = `${process.env.ELEXON_BASE}/datasets/FUELHH/stream?${searchParams}`;
 
 	try {
-		const upstream = await fetch(upstreamUrl, {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "forecast-monitoring-app/1.0",
-			},
-
-			next: { revalidate: 0 },
-		});
+		const upstream = await fetch(upstreamUrl);
 
 		if (!upstream.ok) {
 			const body = await upstream.text();
@@ -40,6 +31,7 @@ export async function GET(request: NextRequest) {
 		}
 
 		const data = await upstream.json();
+		console.log("actuals", data);
 		return NextResponse.json(data);
 	} catch (err) {
 		console.error("[api/actuals] Fetch failed:", err);
