@@ -2,7 +2,9 @@
 
 import { AppHeader } from "@/components/AppHeader";
 import { ControlPanel } from "@/components/ControlPanel";
+import { ForecastChart } from "@/components/ForecastChart";
 import { MetricsBar } from "@/components/MetricsBar";
+import { ErrorMessage, LoadingSpinner } from "@/components/StatusStates";
 import { makeHistoricalWindow } from "@/lib/dateUtils";
 import { useCallback, useState } from "react";
 
@@ -46,6 +48,16 @@ export default function Home() {
 					<MetricsBar metrics={metrics} />
 				</section>
 			)}
+
+			<section>
+				{false ? (
+					<LoadingSpinner />
+				) : false ? (
+					<ErrorMessage message={"error"} onRetry={handleFetch} />
+				) : (
+					<ForecastChart data={[]} />
+				)}
+			</section>
 		</div>
 	);
 }
