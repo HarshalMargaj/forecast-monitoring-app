@@ -6,7 +6,7 @@ import {
 	mergeToChartData,
 } from "@/lib/dataProcessing";
 import { ForecastDataResult } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useForecastData(
 	from: string,
@@ -19,9 +19,14 @@ export function useForecastData(
 		error: null,
 		metrics: null,
 	});
+	const abortRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		if (!from || !to) return;
+
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
 
 		const run = async () => {
 			setResult({
@@ -32,9 +37,12 @@ export function useForecastData(
 			});
 			try {
 				const [actualRecords, forecastRecords] = await Promise.all([
-					fetchActuals(from, to),
-					fetchForecasts(from, to, horizonHours),
+					fetchActuals(from, to, controller.signal),
+					fetchForecasts(from, to, horizonHours, controller.signal),
 				]);
+
+				if (controller.signal.aborted) return;
+
 				const actualsMap = buildActualsMap(actualRecords);
 				const forecastsMap = buildForecastsMap(
 					forecastRecords,
@@ -65,6 +73,10 @@ export function useForecastData(
 		};
 
 		run();
+
+		return () => {
+			controller.abort();
+		};
 	}, [from, to, horizonHours]);
 
 	return result;
