@@ -52,7 +52,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 	);
 }
 
-function makeTickFormatter(data: ChartDataPoint[], maxTicks = 10) {
+function makeTickFormatter(data: ChartDataPoint[], maxTicks = 5) {
 	const step = Math.max(1, Math.ceil(data.length / maxTicks));
 	return (_: unknown, index: number) =>
 		index % step === 0 ? (data[index]?.timeLabel ?? "") : "";
@@ -92,7 +92,10 @@ export function ForecastChart({ data }: ForecastChartProps) {
 					<XAxis
 						dataKey="timeLabel"
 						tickFormatter={tickFormatter}
-						tick={{ fontSize: 11, fill: "#94a3b8" }}
+						tick={{
+							fontSize: 11,
+							fill: "#94a3b8",
+						}}
 						axisLine={{ stroke: "#e2e8f0" }}
 						tickLine={false}
 						label={{
