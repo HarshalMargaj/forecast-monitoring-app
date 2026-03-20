@@ -81,7 +81,7 @@ export function ControlPanel({
           shadow-sm transition-all duration-150
           hover:bg-blue-700 active:scale-95
           disabled:cursor-not-allowed disabled:opacity-60
-          focus:outline-none focus:ring-2 focus:ring-blue-300
+          focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer
         "
 			>
 				{isLoading ? "Loading…" : "Fetch Data"}
