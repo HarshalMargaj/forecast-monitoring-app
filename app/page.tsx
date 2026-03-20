@@ -5,6 +5,7 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { ForecastChart } from "@/components/ForecastChart";
 import { MetricsBar } from "@/components/MetricsBar";
 import { ErrorMessage, LoadingSpinner } from "@/components/StatusStates";
+import { useForecastData } from "@/hooks/useForecastData";
 import { makeHistoricalWindow } from "@/lib/dateUtils";
 import { useCallback, useState } from "react";
 
@@ -19,13 +20,18 @@ export default function Home() {
 	const [appliedStart, setAppliedStart] = useState(INITIAL.start);
 	const [appliedEnd, setAppliedEnd] = useState(INITIAL.end);
 	const [appliedHorizon, setAppliedHorizon] = useState(DEFAULT_HORIZON);
-	const metrics = null;
 
 	const handleFetch = useCallback(() => {
 		setAppliedStart(startTime);
 		setAppliedEnd(endTime);
 		setAppliedHorizon(horizonHours);
 	}, [startTime, endTime, horizonHours]);
+
+	const { chartData, isLoading, error, metrics } = useForecastData(
+		appliedStart,
+		appliedEnd,
+		appliedHorizon,
+	);
 
 	return (
 		<div className="bg-white h-full">
@@ -35,7 +41,7 @@ export default function Home() {
 					startTime={startTime}
 					endTime={endTime}
 					horizonHours={horizonHours}
-					isLoading={false}
+					isLoading={isLoading}
 					onStartChange={setStartTime}
 					onEndChange={setEndTime}
 					onHorizonChange={setHorizonHours}
@@ -50,12 +56,12 @@ export default function Home() {
 			)}
 
 			<section>
-				{false ? (
+				{isLoading ? (
 					<LoadingSpinner />
-				) : false ? (
-					<ErrorMessage message={"error"} onRetry={handleFetch} />
+				) : error ? (
+					<ErrorMessage message={error} onRetry={handleFetch} />
 				) : (
-					<ForecastChart data={[]} />
+					<ForecastChart data={chartData} />
 				)}
 			</section>
 		</div>
